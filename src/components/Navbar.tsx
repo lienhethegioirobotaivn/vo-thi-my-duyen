@@ -15,7 +15,7 @@ export const navItems = [
   { labelVi: "LIÊN HỆ", labelEn: "Contact", href: "/contact" },
 ];
 
-export default function Navbar() {
+export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [language, setLanguage] = useState<"VI" | "EN">("VI");
 

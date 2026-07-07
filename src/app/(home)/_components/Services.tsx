@@ -94,12 +94,12 @@ export function Services() {
           <div className="h-px bg-[#e2d5c3] grow" />
         </div>
         <div className="flex lg:hidden items-center justify-center w-full gap-1 mb-8">
-          <h2 className="flex flex-col items-center text-center text-3xl sm:text-3xl font-bold text-[#0a1b35]">
+          <h2 className="flex flex-col items-center text-center text-2xl sm:text-2xl font-bold text-[#0a1b35]">
             <span style={{ fontFamily: "var(--font-playfair), serif" }}>
               DỊCH VỤ CUNG CẤP
             </span>
-            <span className="mt-0.5 text-gray-500 font-normal text-lg sm:text-xl italic">
-              SERVICES
+            <span className="mt-1 text-gray-500 font-normal text-base sm:text-lg italic">
+              / SERVICES
             </span>
           </h2>
         </div>
@@ -129,7 +129,7 @@ export function Services() {
                   key={index}
                   className="shrink-0 w-full sm:w-[calc((100%-16px)/2)] md:w-[calc((100%-48px)/3)] lg:w-[calc((100%-72px)/4)] xl:w-[calc((100%-96px)/5)] flex flex-col items-center"
                 >
-                  <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-sm bg-[#0a1b35] mb-4">
+                  <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-sm mb-4">
                     <Image
                       src={item.img}
                       alt={item.vi}
@@ -138,11 +138,11 @@ export function Services() {
                     />
                   </div>
 
-                  <h3 className="text-xs sm:text-sm font-bold text-[#0a1b35] text-center leading-snug flex items-center justify-center px-2">
+                  <h3 className="text-sm font-bold text-[#0a1b35] text-center leading-snug flex items-center justify-center px-2">
                     {item.vi}
                   </h3>
 
-                  <p className="text-[11px] sm:text-xs italic text-[#0a1b35]/90 text-center mt-1 leading-normal flex items-start justify-center px-2">
+                  <p className="text-xs italic text-[#0a1b35]/90 text-center mt-1 leading-normal flex items-start justify-center px-2">
                     {item.en}
                   </p>
                 </div>

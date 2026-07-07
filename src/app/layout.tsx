@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Montserrat, Great_Vibes } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 
 const playfair = Playfair_Display({
   subsets: ["vietnamese", "latin"],
@@ -45,6 +46,7 @@ export default function RootLayout({
       >
         <Navbar />
         <main className="grow">{children}</main>
+        <Footer />
       </body>
     </html>
   );

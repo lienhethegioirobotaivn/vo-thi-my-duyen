@@ -74,8 +74,8 @@ export function ProfileHighlights() {
                 <span style={{ fontFamily: "var(--font-playfair), serif" }}>
                   HỒ SƠ NỔI BẬT
                 </span>
-                <span className="mt-0.5 text-gray-500 font-normal text-lg sm:text-xl italic">
-                  PROFILE HIGHLIGHTS
+                <span className="mt-1 text-gray-500 font-normal text-lg sm:text-xl italic">
+                  / PROFILE HIGHLIGHTS
                 </span>
               </h2>
             </div>

@@ -63,8 +63,8 @@ export function AreasOfExpertise() {
               <span style={{ fontFamily: "var(--font-playfair), serif" }}>
                 CÁC MẢNG CHUYÊN MÔN
               </span>
-              <span className="mt-0.5 text-gray-500 font-normal text-base sm:text-lg italic">
-                AREAS OF EXPERTISE
+              <span className="mt-1 text-gray-500 font-normal text-base sm:text-lg italic">
+                / AREAS OF EXPERTISE
               </span>
             </h2>
           </div>
