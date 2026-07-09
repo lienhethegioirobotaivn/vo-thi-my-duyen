@@ -1,0 +1,36 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model HeroConfig {
+  id              String       @id @default(cuid())
+  bgUrl           String?      
+  topSubtitle     String?     
+  mainTitleLine1  String?     
+  mainTitleLine2  String?     
+  engSubtitle     String?     
+  descVi          String?     
+  descEn          String?     
+  buttons         HeroButton[]
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
+
+model HeroButton {
+  id           String     @id @default(cuid())
+  textVi       String?   
+  textEn       String?   
+  primary      Boolean?   @default(false)
+  href         String?   
+  order        Int?       @default(0)    
+  heroConfigId String
+  heroConfig   HeroConfig @relation(fields: [heroConfigId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([heroConfigId])
+}
