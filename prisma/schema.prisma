@@ -317,3 +317,24 @@ model NavItem {
 
   @@index([navbarConfigId])
 }
+
+model FooterConfig {
+  id              String   @id @default(cuid())
+  contactTitleVi  String?  @default("THÔNG TIN LIÊN HỆ")
+  contactTitleEn  String?  @default("CONTACT INFORMATION")
+  phone           String?  @default("090 000 0000")
+  email           String?  @default("duyen@kingsman.edu.vn")
+  website         String?  @default("www.vothimyduyen.com")
+  addressVi       String?  @default("TP. Hồ Chí Minh, Việt Nam")
+  addressEn       String?  @default("Ho Chi Minh City, Vietnam")
+  bookTitleVi     String?  @default("ĐẶT LỊCH DIỄN GIẢ")
+  bookTitleEn     String?  @default("BOOK THE SPEAKER")
+  newsletterTitleVi String? @default("NHẬN TÀI LIỆU & CẬP NHẬT")
+  newsletterTitleEn String? @default("GET RESOURCES & UPDATES")
+  newsletterDescVi  String? @default("Đăng ký nhận tài liệu, thông tin mới nhất và lịch đào tạo từ ThS. Võ Thị Mỹ Duyên.")
+  newsletterDescEn  String? @default("Subscribe to receive latest resources, updates & training schedule.")
+  copyrightText   String?  @default("© 2026 ThS. Võ Thị Mỹ Duyên. All rights reserved.")
+  sloganText      String?  @default("Inspire Minds – Empower Change – Create Lasting Value")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
