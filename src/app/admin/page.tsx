@@ -7,6 +7,7 @@ import { HeroForm } from "./_components/HeroForm";
 import { StatsForm } from "./_components/StatsForm";
 import { ProfileForm } from "./_components/ProfileForm";
 import { ExpertiseForm } from "./_components/ExpertiseForm";
+import { ServicesForm } from "./_components/ServicesForm";
 import { uploadAndCleanStorage } from "@/utils/supabase/storage";
 
 interface ButtonParam {
@@ -41,6 +42,14 @@ interface ExpertiseItemParam {
   imageFile?: File | null;
 }
 
+interface ServiceItemParam {
+  id?: string;
+  vi: string | null;
+  en: string | null;
+  img: string | null;
+  imageFile?: File | null;
+}
+
 export default async function AdminDashboard() {
   const supabase = await createClient();
   const {
@@ -71,6 +80,10 @@ export default async function AdminDashboard() {
   });
 
   const expertiseConfig = await prisma.expertiseConfig.findFirst({
+    include: { items: { orderBy: { order: "asc" } } },
+  });
+
+  const servicesConfig = await prisma.servicesConfig.findFirst({
     include: { items: { orderBy: { order: "asc" } } },
   });
 
@@ -310,6 +323,70 @@ export default async function AdminDashboard() {
     revalidatePath("/admin");
   }
 
+  async function updateServicesAction(
+    formData: FormData,
+    servicesList: ServiceItemParam[],
+  ) {
+    "use server";
+    const titleVi = (formData.get("titleVi") as string) || "";
+    const titleEn = (formData.get("titleEn") as string) || "";
+
+    const processedItems = [];
+
+    for (let i = 0; i < servicesList.length; i++) {
+      const item = servicesList[i];
+      let currentImg = item.img;
+
+      if (item.imageFile) {
+        currentImg = await uploadAndCleanStorage({
+          bucketName: "services-images",
+          newFile: item.imageFile,
+          oldUrl: item.id ? item.img : null,
+        });
+      }
+
+      processedItems.push({
+        vi: item.vi || "",
+        en: item.en || "",
+        img: currentImg || "",
+        order: i,
+      });
+    }
+
+    const existingConfig = await prisma.servicesConfig.findFirst();
+
+    if (existingConfig) {
+      await prisma.$transaction([
+        prisma.serviceItem.deleteMany({
+          where: { servicesConfigId: existingConfig.id },
+        }),
+        prisma.servicesConfig.update({
+          where: { id: existingConfig.id },
+          data: {
+            titleVi,
+            titleEn,
+            items: {
+              create: processedItems,
+            },
+          },
+        }),
+      ]);
+    } else {
+      await prisma.servicesConfig.create({
+        data: {
+          titleVi,
+          titleEn,
+          items: {
+            create: processedItems,
+          },
+        },
+      });
+    }
+
+    revalidatePath("/");
+    revalidatePath("/admin");
+  }
+
   const sanitizedExpertiseData = expertiseConfig
     ? {
         id: expertiseConfig.id,
@@ -330,6 +407,26 @@ export default async function AdminDashboard() {
       }
     : null;
 
+  const sanitizedServicesData = servicesConfig
+    ? {
+        id: servicesConfig.id,
+        createdAt: servicesConfig.createdAt,
+        updatedAt: servicesConfig.updatedAt,
+        titleVi: servicesConfig.titleVi || "DỊCH VỤ CUNG CẤP",
+        titleEn: servicesConfig.titleEn || "SERVICES",
+        items: servicesConfig.items.map((item) => ({
+          id: item.id,
+          createdAt: item.createdAt,
+          updatedAt: item.updatedAt,
+          servicesConfigId: item.servicesConfigId,
+          order: item.order,
+          vi: item.vi || "",
+          en: item.en || "",
+          img: item.img || "",
+        })),
+      }
+    : null;
+
   return (
     <AdminLayout userEmail={user?.email} logoutAction={logout}>
       <div className="space-y-10">
@@ -339,6 +436,10 @@ export default async function AdminDashboard() {
         <ExpertiseForm
           initialData={sanitizedExpertiseData}
           onSave={updateExpertiseAction}
+        />
+        <ServicesForm
+          initialData={sanitizedServicesData}
+          onSave={updateServicesAction}
         />
       </div>
     </AdminLayout>

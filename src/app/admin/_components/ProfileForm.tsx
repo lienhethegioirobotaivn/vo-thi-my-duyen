@@ -117,6 +117,9 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
         <label className="text-sm font-semibold text-gray-700 block">
           Ảnh chân dung đại diện (Profile Image)
         </label>
+        <span className="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+          Kích thước khuyến nghị: 900 x 1200 px (Tỷ lệ 3:4, dưới 2MB)
+        </span>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center pt-2">
           <div className="md:col-span-1 relative aspect-3/4 rounded-lg overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center">
             {previewUrl ? (
@@ -134,9 +137,7 @@ export function ProfileForm({ initialData, onSave }: ProfileFormProps) {
             <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
                 <Upload size={24} className="text-gray-400 mb-1" />
-                <p className="text-xs text-gray-500 font-medium">
-                  Thay đổi hình ảnh hồ sơ
-                </p>
+                <p className="text-xs text-gray-500 font-medium">Tải ảnh lên</p>
               </div>
               <input
                 type="file"
