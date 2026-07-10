@@ -11,6 +11,7 @@ import { ServicesForm } from "./_components/ServicesForm";
 import { ConnectionsAndMediaForm } from "./_components/ConnectionsAndMediaForm";
 import { ConnectAndTrainingForm } from "./_components/ConnectAndTrainingForm";
 import { ActivityHighlightsForm } from "./_components/ActivityHighlightsForm";
+import { StrategicClientsForm } from "./_components/StrategicClientsForm";
 import { uploadAndCleanStorage } from "@/utils/supabase/storage";
 
 interface ButtonParam {
@@ -92,11 +93,23 @@ interface SocialParam {
   iconImg: string;
   imageFile?: File | null;
 }
-
 interface ActivityItemParam {
   id?: string;
   src: string;
   imageFile?: File | null;
+}
+
+interface LogoItemParam {
+  id?: string;
+  src: string;
+  imageFile?: File | null;
+}
+interface TabItemParam {
+  id?: string;
+  tabKey: string;
+  vi: string;
+  en: string;
+  logos: LogoItemParam[];
 }
 
 export default async function AdminDashboard() {
@@ -143,9 +156,17 @@ export default async function AdminDashboard() {
       socials: { orderBy: { order: "asc" } },
     },
   });
-
   const activityConfig = await prisma.activityConfig.findFirst({
     include: { items: { orderBy: { order: "asc" } } },
+  });
+
+  const clientConfig = await prisma.clientConfig.findFirst({
+    include: {
+      tabs: {
+        orderBy: { order: "asc" },
+        include: { logos: { orderBy: { order: "asc" } } },
+      },
+    },
   });
 
   async function updateHeroAction(
@@ -641,13 +662,10 @@ export default async function AdminDashboard() {
     "use server";
     const titleVi = (formData.get("titleVi") as string) || "";
     const titleEn = (formData.get("titleEn") as string) || "";
-
     const processedImages = [];
-
     for (let i = 0; i < activityList.length; i++) {
       const item = activityList[i];
       let currentSrc = item.src;
-
       if (item.imageFile) {
         currentSrc = await uploadAndCleanStorage({
           bucketName: "activity-images",
@@ -655,15 +673,9 @@ export default async function AdminDashboard() {
           oldUrl: item.id ? item.src : null,
         });
       }
-
-      processedImages.push({
-        src: currentSrc || "",
-        order: i,
-      });
+      processedImages.push({ src: currentSrc || "", order: i });
     }
-
     const existingConfig = await prisma.activityConfig.findFirst();
-
     if (existingConfig) {
       await prisma.$transaction([
         prisma.activityImage.deleteMany({
@@ -671,25 +683,86 @@ export default async function AdminDashboard() {
         }),
         prisma.activityConfig.update({
           where: { id: existingConfig.id },
-          data: {
-            titleVi,
-            titleEn,
-            items: {
-              create: processedImages,
-            },
-          },
+          data: { titleVi, titleEn, items: { create: processedImages } },
         }),
       ]);
     } else {
       await prisma.activityConfig.create({
+        data: { titleVi, titleEn, items: { create: processedImages } },
+      });
+    }
+    revalidatePath("/");
+    revalidatePath("/admin");
+  }
+
+  async function updateClientsAction(
+    formData: FormData,
+    tabsList: TabItemParam[],
+  ) {
+    "use server";
+    const titleVi = (formData.get("titleVi") as string) || "";
+    const titleEn = (formData.get("titleEn") as string) || "";
+    const footerVi = (formData.get("footerVi") as string) || "";
+    const footerEn = (formData.get("footerEn") as string) || "";
+
+    const existingConfig = await prisma.clientConfig.findFirst();
+    let configId = existingConfig?.id;
+
+    if (existingConfig) {
+      await prisma.clientConfig.update({
+        where: { id: existingConfig.id },
+        data: { titleVi, titleEn, footerVi, footerEn },
+      });
+    } else {
+      const created = await prisma.clientConfig.create({
+        data: { titleVi, titleEn, footerVi, footerEn },
+      });
+      configId = created.id;
+    }
+
+    const currentTabsInDb = await prisma.clientTab.findMany({
+      where: { clientConfigId: configId },
+      include: { logos: true },
+    });
+
+    await prisma.clientTab.deleteMany({ where: { clientConfigId: configId } });
+
+    for (let t = 0; t < tabsList.length; t++) {
+      const inputTab = tabsList[t];
+
+      const createdTab = await prisma.clientTab.create({
         data: {
-          titleVi,
-          titleEn,
-          items: {
-            create: processedImages,
-          },
+          tabKey: inputTab.tabKey,
+          vi: inputTab.vi,
+          en: inputTab.en,
+          order: t,
+          clientConfigId: configId!,
         },
       });
+
+      const processedLogos = [];
+      for (let l = 0; l < inputTab.logos.length; l++) {
+        const logoItem = inputTab.logos[l];
+        let finalSrc = logoItem.src;
+
+        if (logoItem.imageFile) {
+          finalSrc = await uploadAndCleanStorage({
+            bucketName: "client-logos",
+            newFile: logoItem.imageFile,
+            oldUrl: logoItem.id ? logoItem.src : null,
+          });
+        }
+
+        processedLogos.push({
+          src: finalSrc || "",
+          order: l,
+          clientTabId: createdTab.id,
+        });
+      }
+
+      if (processedLogos.length > 0) {
+        await prisma.clientLogo.createMany({ data: processedLogos });
+      }
     }
 
     revalidatePath("/");
@@ -793,7 +866,6 @@ export default async function AdminDashboard() {
         })),
       }
     : null;
-
   const sanitizedActivityData = activityConfig
     ? {
         id: activityConfig.id,
@@ -802,6 +874,23 @@ export default async function AdminDashboard() {
         items: activityConfig.items.map((item) => ({
           id: item.id,
           src: item.src || "",
+        })),
+      }
+    : null;
+
+  const sanitizedClientsData = clientConfig
+    ? {
+        id: clientConfig.id,
+        titleVi: clientConfig.titleVi || "KHÁCH HÀNG CHIẾN LƯỢC",
+        titleEn: clientConfig.titleEn || "STRATEGIC CLIENTS",
+        footerVi: clientConfig.footerVi || "",
+        footerEn: clientConfig.footerEn || "",
+        tabs: clientConfig.tabs.map((t) => ({
+          id: t.id,
+          tabKey: t.tabKey,
+          vi: t.vi || "",
+          en: t.en || "",
+          logos: t.logos.map((l) => ({ id: l.id, src: l.src || "" })),
         })),
       }
     : null;
@@ -831,6 +920,10 @@ export default async function AdminDashboard() {
         <ActivityHighlightsForm
           initialData={sanitizedActivityData}
           onSave={updateActivityAction}
+        />
+        <StrategicClientsForm
+          initialData={sanitizedClientsData}
+          onSave={updateClientsAction}
         />
       </div>
     </AdminLayout>

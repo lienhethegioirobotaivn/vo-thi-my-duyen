@@ -250,3 +250,41 @@ model ActivityImage {
 
   @@index([activityConfigId])
 }
+
+model ClientConfig {
+  id          String        @id @default(cuid())
+  titleVi     String?       @default("KHÁCH HÀNG CHIẾN LƯỢC")
+  titleEn     String?       @default("STRATEGIC CLIENTS")
+  footerVi    String?       @default("VÀ HƠN 2,000+ DOANH NGHIỆP & TỔ CHỨC TRÊN TOÀN QUỐC")
+  footerEn    String?       @default("AND 2,000+ ENTERPRISES & ORGANIZATIONS NATIONWIDE")
+  tabs        ClientTab[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model ClientTab {
+  id             String       @id @default(cuid())
+  tabKey         String
+  vi             String?
+  en             String?
+  order          Int?         @default(0)
+  clientConfigId String
+  clientConfig   ClientConfig @relation(fields: [clientConfigId], references: [id], onDelete: Cascade)
+  logos          ClientLogo[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([clientConfigId])
+}
+
+model ClientLogo {
+  id          String    @id @default(cuid())
+  src         String?
+  order       Int?      @default(0)
+  clientTabId String
+  clientTab   ClientTab @relation(fields: [clientTabId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([clientTabId])
+}
