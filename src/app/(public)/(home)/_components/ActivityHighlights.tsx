@@ -19,12 +19,10 @@ export async function ActivityHighlights() {
   )
     return null;
 
-  const titleVi = activityConfig.titleVi || "HÌNH ẢNH HOẠT ĐỘNG";
-  const titleEn = activityConfig.titleEn || "ACTIVITY HIGHLIGHTS";
+  const titleVi = activityConfig.titleVi || "";
+  const titleEn = activityConfig.titleEn || "";
 
-  const imagesList = activityConfig.items.map(
-    (item) => item.src || "/activity_1.jpg",
-  );
+  const imagesList = activityConfig.items.map((item) => item.src || "");
 
   return (
     <section className="w-full bg-[#fbfbfa] py-12 lg:py-16 overflow-hidden">
