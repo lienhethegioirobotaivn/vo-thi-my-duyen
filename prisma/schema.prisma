@@ -7,17 +7,17 @@ generator client {
 }
 
 model HeroConfig {
-  id              String       @id @default(cuid())
-  bgUrl           String?      
-  topSubtitle     String?     
-  mainTitleLine1  String?     
-  mainTitleLine2  String?     
-  engSubtitle     String?     
-  descVi          String?     
-  descEn          String?     
-  buttons         HeroButton[]
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  id             String       @id @default(cuid())
+  bgUrl          String?      
+  topSubtitle    String?      
+  mainTitleLine1 String?      
+  mainTitleLine2 String?      
+  engSubtitle    String?      
+  descVi         String?      
+  descEn         String?      
+  buttons        HeroButton[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 }
 
 model HeroButton {
@@ -33,4 +33,61 @@ model HeroButton {
   updatedAt    DateTime   @updatedAt
 
   @@index([heroConfigId])
+}
+
+model Stat {
+  id        String   @id @default(cuid())
+  value     String?
+  titleVi   String?
+  titleEn   String?
+  iconSrc   String?
+  order     Int?     @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProfileConfig {
+  id        String        @id @default(cuid())
+  titleVi   String?       @default("HỒ SƠ NỔI BẬT")
+  titleEn   String?       @default("PROFILE HIGHLIGHTS")
+  avatarUrl String?
+  items     ProfileItem[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model ProfileItem {
+  id              String        @id @default(cuid())
+  vi              String?
+  en              String?
+  order           Int?          @default(0)
+  profileConfigId String
+  profileConfig   ProfileConfig @relation(fields: [profileConfigId], references: [id], onDelete: Cascade)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([profileConfigId])
+}
+
+model ExpertiseConfig {
+  id        String      @id @default(cuid())
+  titleVi   String?     @default("CÁC MẢNG CHUYÊN MÔN")
+  titleEn   String?     @default("AREAS OF EXPERTISE")
+  items     Expertise[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model Expertise {
+  id                String          @id @default(cuid())
+  vi                String?
+  en                String?
+  icon              String?
+  order             Int?            @default(0)
+  expertiseConfigId String
+  expertiseConfig   ExpertiseConfig @relation(fields: [expertiseConfigId], references: [id], onDelete: Cascade)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([expertiseConfigId])
 }

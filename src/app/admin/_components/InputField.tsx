@@ -24,42 +24,46 @@ export function InputField({
         {label}
       </label>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <span className="text-xs text-gray-600 block mb-1">Tiếng Việt</span>
-          {isTextArea ? (
-            <textarea
-              name={nameVi}
-              defaultValue={defaultValueVi}
-              rows={3}
-              className={inputClass}
-            />
-          ) : (
-            <input
-              type="text"
-              name={nameVi}
-              defaultValue={defaultValueVi}
-              className={inputClass}
-            />
-          )}
-        </div>
-        <div>
-          <span className="text-xs text-gray-600 block mb-1">Tiếng Anh</span>
-          {isTextArea ? (
-            <textarea
-              name={nameEn}
-              defaultValue={defaultValueEn}
-              rows={3}
-              className={inputClass}
-            />
-          ) : (
-            <input
-              type="text"
-              name={nameEn}
-              defaultValue={defaultValueEn}
-              className={inputClass}
-            />
-          )}
-        </div>
+        {defaultValueVi && (
+          <div>
+            <span className="text-xs text-gray-600 block mb-1">Tiếng Việt</span>
+            {isTextArea ? (
+              <textarea
+                name={nameVi}
+                defaultValue={defaultValueVi}
+                rows={3}
+                className={inputClass}
+              />
+            ) : (
+              <input
+                type="text"
+                name={nameVi}
+                defaultValue={defaultValueVi}
+                className={inputClass}
+              />
+            )}
+          </div>
+        )}
+        {defaultValueEn && (
+          <div>
+            <span className="text-xs text-gray-600 block mb-1">Tiếng Anh</span>
+            {isTextArea ? (
+              <textarea
+                name={nameEn}
+                defaultValue={defaultValueEn}
+                rows={3}
+                className={inputClass}
+              />
+            ) : (
+              <input
+                type="text"
+                name={nameEn}
+                defaultValue={defaultValueEn}
+                className={inputClass}
+              />
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

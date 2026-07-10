@@ -155,7 +155,6 @@ export function HeroForm({ initialData, onSave }: HeroFormProps) {
           nameVi="topSubtitle"
           nameEn="topSubtitleEn"
           defaultValueVi={initialData?.topSubtitle || ""}
-          defaultValueEn={initialData?.topSubtitle || ""}
         />
 
         <InputField
@@ -163,7 +162,6 @@ export function HeroForm({ initialData, onSave }: HeroFormProps) {
           nameVi="mainTitleLine1"
           nameEn="mainTitleLine1En"
           defaultValueVi={initialData?.mainTitleLine1 || ""}
-          defaultValueEn={initialData?.mainTitleLine1 || ""}
         />
 
         <InputField
@@ -171,14 +169,12 @@ export function HeroForm({ initialData, onSave }: HeroFormProps) {
           nameVi="mainTitleLine2"
           nameEn="mainTitleLine2En"
           defaultValueVi={initialData?.mainTitleLine2 || ""}
-          defaultValueEn={initialData?.mainTitleLine2 || ""}
         />
 
         <InputField
           label="Tiêu đề phụ tiếng Anh cố định (English Subtitle)"
           nameVi="engSubtitle"
           nameEn="engSubtitleEn"
-          defaultValueVi={initialData?.engSubtitle || ""}
           defaultValueEn={initialData?.engSubtitle || ""}
         />
 

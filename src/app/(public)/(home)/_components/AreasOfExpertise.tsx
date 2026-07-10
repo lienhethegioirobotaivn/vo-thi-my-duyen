@@ -1,43 +1,26 @@
 import Image from "next/image";
+import { prisma } from "@/lib/prisma";
 
-export function AreasOfExpertise() {
-  const expertiseItems = [
-    {
-      vi: "Kỹ năng giao tiếp & thuyết trình",
-      en: "Communication & Presentation",
-      icon: "/home/26.png",
+export async function AreasOfExpertise() {
+  const expertiseConfig = await prisma.expertiseConfig.findFirst({
+    include: {
+      items: {
+        orderBy: {
+          order: "asc",
+        },
+      },
     },
-    {
-      vi: "Lãnh đạo & phát triển bản thân",
-      en: "Leadership & Personal Development",
-      icon: "/home/9.png",
-    },
-    {
-      vi: "Văn hóa & giá trị Việt Nam",
-      en: "Vietnamese Culture & Values",
-      icon: "/home/11.png",
-    },
-    {
-      vi: "Quản trị & vận hành doanh nghiệp",
-      en: "Management & Business Operations",
-      icon: "/home/3.png",
-    },
-    {
-      vi: "Thương hiệu cá nhân & truyền thông",
-      en: "Personal Branding & Communication",
-      icon: "/home/38.png",
-    },
-    {
-      vi: "Giáo dục & phát triển thế hệ trẻ",
-      en: "Education & Youth Development",
-      icon: "/home/5.png",
-    },
-    {
-      vi: "Phụ nữ & truyền cảm hứng",
-      en: "Women & Inspiration",
-      icon: "/home/34.png",
-    },
-  ];
+  });
+
+  if (
+    !expertiseConfig ||
+    !expertiseConfig.items ||
+    expertiseConfig.items.length === 0
+  )
+    return null;
+
+  const titleVi = expertiseConfig.titleVi || "CÁC MẢNG CHUYÊN MÔN";
+  const titleEn = expertiseConfig.titleEn || "AREAS OF EXPERTISE";
 
   return (
     <section className="w-full bg-[#fbfbfa] py-12 lg:py-16">
@@ -47,13 +30,13 @@ export function AreasOfExpertise() {
             <div className="h-px bg-[#e2d5c3] grow" />
             <h2 className="shrink-0 flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-center text-xl sm:text-2xl font-bold text-[#0a1b35]">
               <span style={{ fontFamily: "var(--font-playfair), serif" }}>
-                CÁC MẢNG CHUYÊN MÔN
+                {titleVi}
               </span>
               <span className="mt-1 text-gray-500 font-normal text-base sm:text-xl italic">
                 /
               </span>
               <span className="mt-1 text-gray-500 font-normal text-base sm:text-xl italic">
-                AREAS OF EXPERTISE
+                {titleEn}
               </span>
             </h2>
             <div className="h-px bg-[#e2d5c3] grow" />
@@ -61,24 +44,24 @@ export function AreasOfExpertise() {
           <div className="flex lg:hidden items-center justify-center w-full gap-1 mb-8">
             <h2 className="flex flex-col items-center text-center text-[1.4rem] sm:text-2xl font-bold text-[#0a1b35]">
               <span style={{ fontFamily: "var(--font-playfair), serif" }}>
-                CÁC MẢNG CHUYÊN MÔN
+                {titleVi}
               </span>
               <span className="mt-1 text-gray-500 font-normal text-base sm:text-lg italic">
-                / AREAS OF EXPERTISE
+                / {titleEn}
               </span>
             </h2>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-y-8 lg:gap-y-0 lg:divide-x lg:divide-[#e2d5c3]/60">
-            {expertiseItems.map((item, index) => (
+            {expertiseConfig.items.map((item) => (
               <div
-                key={index}
+                key={item.id}
                 className="flex flex-col items-center text-center px-2 lg:px-3"
               >
                 <div className="relative size-14 shrink-0 mb-3">
                   <Image
-                    src={item.icon}
-                    alt={item.vi.replace("\n", " ")}
+                    src={item.icon ?? ""}
+                    alt={(item.vi ?? "").replace("\n", " ")}
                     fill
                     className="object-contain"
                   />
