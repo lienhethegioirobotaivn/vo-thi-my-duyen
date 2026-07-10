@@ -13,13 +13,25 @@ export default function Home() {
     <div>
       <Hero />
       <Stats />
-      <ProfileHighlights />
+      <div id="about">
+        <ProfileHighlights />
+      </div>
       <AreasOfExpertise />
-      <Services />
-      <ConnectionsAndMedia />
-      <ConnectAndTraining />
-      <ActivityHighlights />
-      <StrategicClients />
+      <div id="services">
+        <Services />
+      </div>
+      <div id="training">
+        <ConnectionsAndMedia />
+      </div>
+      <div id="contact">
+        <ConnectAndTraining />
+      </div>
+      <div id="news">
+        <ActivityHighlights />
+      </div>
+      <div id="clients">
+        <StrategicClients />
+      </div>
     </div>
   );
 }

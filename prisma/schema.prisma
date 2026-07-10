@@ -288,3 +288,32 @@ model ClientLogo {
 
   @@index([clientTabId])
 }
+
+model NavbarConfig {
+  id           String       @id @default(cuid())
+  logo         String?      @default("/navbar/logo.png")
+  nameVi       String?      @default("ThS. VÕ THỊ MỸ DUYÊN")
+  nameEn       String?      @default("ThS. VO THI MY DUYEN")
+  subtitle1Vi  String?      @default("GIẢNG VIÊN - DIỄN GIẢ - CỐ VẤN CHIẾN LƯỢC")
+  subtitle1En  String?      @default("Lecturer - Speaker - Strategic Advisor")
+  bookTextVi   String?      @default("ĐẶT LỊCH NGAY")
+  bookTextEn   String?      @default("BOOK NOW")
+  bookHref     String?      @default("#book")
+  navItems     NavItem[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model NavItem {
+  id             String       @id @default(cuid())
+  labelVi        String?
+  labelEn        String?
+  href           String?
+  order          Int?         @default(0)
+  navbarConfigId String
+  navbarConfig   NavbarConfig @relation(fields: [navbarConfigId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([navbarConfigId])
+}

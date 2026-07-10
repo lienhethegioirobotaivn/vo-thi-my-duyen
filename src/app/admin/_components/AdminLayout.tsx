@@ -1,7 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, X, Home, LogOut, User } from "lucide-react";
+import { usePathname } from "next/navigation";
+import {
+  Menu,
+  X,
+  Home,
+  LogOut,
+  User,
+  PanelBottom,
+  PanelTop,
+  Undo2,
+} from "lucide-react";
 
 interface AdminLayoutProps {
   userEmail?: string;
@@ -9,15 +19,43 @@ interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
+const NAV_ITEMS = [
+  {
+    label: "Quay lại Website",
+    href: "/",
+    icon: Undo2,
+  },
+  {
+    label: "Quản trị Home",
+    href: "/admin",
+    icon: Home,
+  },
+  {
+    label: "Quản trị Header",
+    href: "/admin/header",
+    icon: PanelTop,
+  },
+  {
+    label: "Quản trị Footer",
+    href: "/admin/footer",
+    icon: PanelBottom,
+  },
+];
+
 export function AdminLayout({
   userEmail,
   logoutAction,
   children,
 }: AdminLayoutProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+
+  const currentNav = NAV_ITEMS.find((item) => item.href === pathname);
+  const pageTitle =
+    currentNav && currentNav.href !== "/" ? currentNav.label : "Tổng quan";
 
   return (
-    <div className="min-h-screen bg-gray-100 flex relative">
+    <div className="h-screen bg-gray-100 flex overflow-hidden relative">
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -27,34 +65,48 @@ export function AdminLayout({
 
       <aside
         className={`
-        fixed inset-y-0 left-0 w-64 bg-[#0a1b35] text-white p-6 space-y-6 z-50 transition-transform duration-300 transform
-        lg:relative lg:transform-none
-        ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-      `}
+          fixed inset-y-0 left-0 w-64 bg-[#0a1b35] text-white p-6 z-50 transition-transform duration-300 transform flex flex-col justify-between overflow-y-auto h-full
+          lg:relative lg:transform-none
+          ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+        `}
       >
-        <div className="flex justify-between items-center">
-          <h1 className="text-xl font-bold tracking-wider text-[#c29b57]">
-            Admin Panel
-          </h1>
-          <button
-            className="lg:hidden text-white/70 hover:text-white p-1"
-            onClick={() => setIsOpen(false)}
-          >
-            <X size={24} />
-          </button>
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h1 className="text-xl font-bold tracking-wider text-[#c29b57]">
+              Admin Panel
+            </h1>
+            <button
+              className="lg:hidden text-white/70 hover:text-white p-1"
+              onClick={() => setIsOpen(false)}
+            >
+              <X size={24} />
+            </button>
+          </div>
+
+          <nav className="space-y-2">
+            {NAV_ITEMS.map((item, index) => {
+              const Icon = item.icon;
+              const isActive = pathname === item.href;
+
+              return (
+                <a
+                  key={index}
+                  href={item.href}
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded font-medium transition-colors ${
+                    isActive
+                      ? "bg-white/10 text-white"
+                      : "text-white hover:bg-white/5"
+                  }`}
+                >
+                  <Icon size={18} />
+                  {item.label}
+                </a>
+              );
+            })}
+          </nav>
         </div>
 
-        <nav className="space-y-2">
-          <a
-            href="/admin"
-            className="flex items-center gap-3 px-4 py-2.5 rounded bg-white/10 font-medium text-white transition-colors"
-          >
-            <Home size={18} />
-            Quản trị Home
-          </a>
-        </nav>
-
-        <div className="pt-4 border-t border-white/10">
+        <div className="pt-4 border-t border-white/10 mt-6 shrink-0">
           <button
             onClick={() => logoutAction()}
             className="flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-white/5 rounded cursor-pointer transition-colors"
@@ -65,8 +117,8 @@ export function AdminLayout({
         </div>
       </aside>
 
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="flex justify-between items-center bg-white p-4 lg:px-8 border-b border-gray-200 shadow-sm sticky top-0 z-30">
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+        <header className="flex justify-between items-center bg-white p-4 lg:px-8 border-b border-gray-200 shadow-sm sticky top-0 z-30 shrink-0">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsOpen(true)}
@@ -75,7 +127,7 @@ export function AdminLayout({
               <Menu size={24} />
             </button>
             <h2 className="text-lg lg:text-xl font-bold text-gray-800 truncate">
-              Cấu hình Trang Chủ
+              {pageTitle}
             </h2>
           </div>
 
@@ -85,7 +137,9 @@ export function AdminLayout({
           </div>
         </header>
 
-        <main className="flex-1 p-4 lg:p-8 overflow-y-auto">{children}</main>
+        <main className="flex-1 p-4 lg:p-8 overflow-y-auto min-h-0">
+          {children}
+        </main>
       </div>
     </div>
   );
