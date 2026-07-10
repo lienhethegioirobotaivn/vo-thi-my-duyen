@@ -10,6 +10,7 @@ import { ExpertiseForm } from "./_components/ExpertiseForm";
 import { ServicesForm } from "./_components/ServicesForm";
 import { ConnectionsAndMediaForm } from "./_components/ConnectionsAndMediaForm";
 import { ConnectAndTrainingForm } from "./_components/ConnectAndTrainingForm";
+import { ActivityHighlightsForm } from "./_components/ActivityHighlightsForm";
 import { uploadAndCleanStorage } from "@/utils/supabase/storage";
 
 interface ButtonParam {
@@ -74,7 +75,6 @@ interface PressParam {
   logoFile?: File | null;
   articleFile?: File | null;
 }
-
 interface ProgramParam {
   id?: string;
   vi: string;
@@ -90,6 +90,12 @@ interface SocialParam {
   url: string;
   bgColor: string;
   iconImg: string;
+  imageFile?: File | null;
+}
+
+interface ActivityItemParam {
+  id?: string;
+  src: string;
   imageFile?: File | null;
 }
 
@@ -131,12 +137,15 @@ export default async function AdminDashboard() {
       pressItems: { orderBy: { order: "asc" } },
     },
   });
-
   const connectTrainingConfig = await prisma.connectTrainingConfig.findFirst({
     include: {
       programs: { orderBy: { order: "asc" } },
       socials: { orderBy: { order: "asc" } },
     },
+  });
+
+  const activityConfig = await prisma.activityConfig.findFirst({
+    include: { items: { orderBy: { order: "asc" } } },
   });
 
   async function updateHeroAction(
@@ -538,14 +547,12 @@ export default async function AdminDashboard() {
     const connectTitleEn = (formData.get("connectTitleEn") as string) || "";
     const fanpageTitle = (formData.get("fanpageTitle") as string) || "";
     const fanpageUrl = (formData.get("fanpageUrl") as string) || "";
-
     const existingConfig = await prisma.connectTrainingConfig.findFirst();
     const currentLogoUrl = await uploadAndCleanStorage({
       bucketName: "media-core",
       newFile: logoFile,
       oldUrl: existingConfig?.logoIcon,
     });
-
     const finalPrograms = [];
     for (let i = 0; i < programsList.length; i++) {
       const item = programsList[i];
@@ -564,7 +571,6 @@ export default async function AdminDashboard() {
         order: i,
       });
     }
-
     const finalSocials = [];
     for (let i = 0; i < socialsList.length; i++) {
       const item = socialsList[i];
@@ -581,12 +587,11 @@ export default async function AdminDashboard() {
         titleEn: item.titleEn || "",
         linkText: item.linkText || "",
         url: item.url || "",
-        bgColor: item.bgColor || "",
+        bgColor: item.bgColor || "#1877F2",
         iconImg: url || "",
         order: i,
       });
     }
-
     if (existingConfig) {
       await prisma.$transaction([
         prisma.trainingProgram.deleteMany({
@@ -622,6 +627,67 @@ export default async function AdminDashboard() {
           logoIcon: currentLogoUrl,
           programs: { create: finalPrograms },
           socials: { create: finalSocials },
+        },
+      });
+    }
+    revalidatePath("/");
+    revalidatePath("/admin");
+  }
+
+  async function updateActivityAction(
+    formData: FormData,
+    activityList: ActivityItemParam[],
+  ) {
+    "use server";
+    const titleVi = (formData.get("titleVi") as string) || "";
+    const titleEn = (formData.get("titleEn") as string) || "";
+
+    const processedImages = [];
+
+    for (let i = 0; i < activityList.length; i++) {
+      const item = activityList[i];
+      let currentSrc = item.src;
+
+      if (item.imageFile) {
+        currentSrc = await uploadAndCleanStorage({
+          bucketName: "activity-images",
+          newFile: item.imageFile,
+          oldUrl: item.id ? item.src : null,
+        });
+      }
+
+      processedImages.push({
+        src: currentSrc || "",
+        order: i,
+      });
+    }
+
+    const existingConfig = await prisma.activityConfig.findFirst();
+
+    if (existingConfig) {
+      await prisma.$transaction([
+        prisma.activityImage.deleteMany({
+          where: { activityConfigId: existingConfig.id },
+        }),
+        prisma.activityConfig.update({
+          where: { id: existingConfig.id },
+          data: {
+            titleVi,
+            titleEn,
+            items: {
+              create: processedImages,
+            },
+          },
+        }),
+      ]);
+    } else {
+      await prisma.activityConfig.create({
+        data: {
+          titleVi,
+          titleEn,
+          items: {
+            create: processedImages,
+          },
         },
       });
     }
@@ -700,7 +766,6 @@ export default async function AdminDashboard() {
         })),
       }
     : null;
-
   const sanitizedConnectTrainingData = connectTrainingConfig
     ? {
         id: connectTrainingConfig.id,
@@ -729,6 +794,18 @@ export default async function AdminDashboard() {
       }
     : null;
 
+  const sanitizedActivityData = activityConfig
+    ? {
+        id: activityConfig.id,
+        titleVi: activityConfig.titleVi || "HÌNH ẢNH HOẠT ĐỘNG",
+        titleEn: activityConfig.titleEn || "ACTIVITY HIGHLIGHTS",
+        items: activityConfig.items.map((item) => ({
+          id: item.id,
+          src: item.src || "",
+        })),
+      }
+    : null;
+
   return (
     <AdminLayout userEmail={user?.email} logoutAction={logout}>
       <div className="space-y-10">
@@ -750,6 +827,10 @@ export default async function AdminDashboard() {
         <ConnectAndTrainingForm
           initialData={sanitizedConnectTrainingData}
           onSave={updateConnectTrainingAction}
+        />
+        <ActivityHighlightsForm
+          initialData={sanitizedActivityData}
+          onSave={updateActivityAction}
         />
       </div>
     </AdminLayout>
