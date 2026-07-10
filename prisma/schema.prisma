@@ -114,3 +114,72 @@ model ServiceItem {
 
   @@index([servicesConfigId])
 }
+
+model MediaConfig {
+  id          String           @id @default(cuid())
+  titleVi     String?          @default("KẾT NỐI & HỢP TÁC QUỐC TẾ")
+  titleEn     String?          @default("INTERNATIONAL CONNECTIONS & COLLABORATIONS")
+  descVi      String?
+  descEn      String?
+  mapImg      String?
+  countries   MediaCountry[]
+  highlights  MediaHighlight[]
+  tvStations  MediaTvStation[]
+  pressItems  MediaPressItem[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model MediaCountry {
+  id            String      @id @default(cuid())
+  vi            String?
+  en            String?
+  flag          String?
+  order         Int?        @default(0)
+  mediaConfigId String
+  mediaConfig   MediaConfig @relation(fields: [mediaConfigId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([mediaConfigId])
+}
+
+model MediaHighlight {
+  id            String      @id @default(cuid())
+  titleVi       String?
+  titleEn       String?
+  img           String?
+  href          String?     @default("#")
+  order         Int?        @default(0)
+  mediaConfigId String
+  mediaConfig   MediaConfig @relation(fields: [mediaConfigId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([mediaConfigId])
+}
+
+model MediaTvStation {
+  id            String      @id @default(cuid())
+  src           String?
+  order         Int?        @default(0)
+  mediaConfigId String
+  mediaConfig   MediaConfig @relation(fields: [mediaConfigId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([mediaConfigId])
+}
+
+model MediaPressItem {
+  id            String      @id @default(cuid())
+  logo          String?
+  article       String?
+  order         Int?        @default(0)
+  mediaConfigId String
+  mediaConfig   MediaConfig @relation(fields: [mediaConfigId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([mediaConfigId])
+}
