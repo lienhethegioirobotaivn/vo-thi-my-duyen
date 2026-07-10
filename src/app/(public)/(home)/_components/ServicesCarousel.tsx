@@ -87,12 +87,14 @@ export function ServicesCarousel({
               className="shrink-0 w-full sm:w-[calc((100%-16px)/2)] md:w-[calc((100%-48px)/3)] lg:w-[calc((100%-72px)/4)] xl:w-[calc((100%-96px)/5)] flex flex-col items-center"
             >
               <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-sm mb-4">
-                <Image
-                  src={item.img}
-                  alt={item.vi}
-                  fill
-                  className="object-cover"
-                />
+                {item.img && (
+                  <Image
+                    src={item.img}
+                    alt={item.vi}
+                    fill
+                    className="object-cover"
+                  />
+                )}
               </div>
 
               <h3 className="text-sm font-bold text-[#0a1b35] text-center leading-snug flex items-center justify-center px-2">

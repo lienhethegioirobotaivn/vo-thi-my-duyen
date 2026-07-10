@@ -25,7 +25,7 @@ export async function Services() {
   const formattedServices = servicesConfig.items.map((item) => ({
     vi: item.vi || "",
     en: item.en || "",
-    img: item.img || "/image_c41173.jpg",
+    img: item.img || "",
   }));
 
   return (

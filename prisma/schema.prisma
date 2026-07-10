@@ -183,3 +183,49 @@ model MediaPressItem {
 
   @@index([mediaConfigId])
 }
+
+model ConnectTrainingConfig {
+  id               String            @id @default(cuid())
+  trainingTitleVi  String?           @default("CHƯƠNG TRÌNH ĐÀO TẠO")
+  trainingTitleEn  String?           @default("TRAINING PROGRAMS")
+  connectTitleVi   String?           @default("KẾT NỐI VỚI TÔI")
+  connectTitleEn   String?           @default("CONNECT WITH ME")
+  fanpageTitle     String?           @default("FANPAGE")
+  fanpageUrl       String?           @default("https://www.facebook.com/KingsmanEducationOrganization")
+  logoIcon         String?           @default("/navbar/logo.png")
+  programs         TrainingProgram[]
+  socials          SocialLink[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+}
+
+model TrainingProgram {
+  id                      String                @id @default(cuid())
+  vi                      String?
+  en                      String?
+  icon                    String?
+  order                   Int?                  @default(0)
+  connectTrainingConfigId String
+  connectTrainingConfig   ConnectTrainingConfig @relation(fields: [connectTrainingConfigId], references: [id], onDelete: Cascade)
+  createdAt               DateTime              @default(now())
+  updatedAt               DateTime              @updatedAt
+
+  @@index([connectTrainingConfigId])
+}
+
+model SocialLink {
+  id                      String                @id @default(cuid())
+  titleVi                 String?
+  titleEn                 String?
+  linkText                String?
+  url                     String?
+  bgColor                 String?               @default("#1877F2")
+  iconImg                 String?
+  order                   Int?                  @default(0)
+  connectTrainingConfigId String
+  connectTrainingConfig   ConnectTrainingConfig @relation(fields: [connectTrainingConfigId], references: [id], onDelete: Cascade)
+  createdAt               DateTime              @default(now())
+  updatedAt               DateTime              @updatedAt
+
+  @@index([connectTrainingConfigId])
+}

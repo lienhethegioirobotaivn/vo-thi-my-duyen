@@ -9,6 +9,7 @@ import { ProfileForm } from "./_components/ProfileForm";
 import { ExpertiseForm } from "./_components/ExpertiseForm";
 import { ServicesForm } from "./_components/ServicesForm";
 import { ConnectionsAndMediaForm } from "./_components/ConnectionsAndMediaForm";
+import { ConnectAndTrainingForm } from "./_components/ConnectAndTrainingForm";
 import { uploadAndCleanStorage } from "@/utils/supabase/storage";
 
 interface ButtonParam {
@@ -46,7 +47,6 @@ interface ServiceItemParam {
   img: string | null;
   imageFile?: File | null;
 }
-
 interface CountryParam {
   id?: string;
   vi: string;
@@ -73,6 +73,24 @@ interface PressParam {
   article: string;
   logoFile?: File | null;
   articleFile?: File | null;
+}
+
+interface ProgramParam {
+  id?: string;
+  vi: string;
+  en: string;
+  icon: string;
+  imageFile?: File | null;
+}
+interface SocialParam {
+  id?: string;
+  titleVi: string;
+  titleEn: string;
+  linkText: string;
+  url: string;
+  bgColor: string;
+  iconImg: string;
+  imageFile?: File | null;
 }
 
 export default async function AdminDashboard() {
@@ -105,13 +123,19 @@ export default async function AdminDashboard() {
   const servicesConfig = await prisma.servicesConfig.findFirst({
     include: { items: { orderBy: { order: "asc" } } },
   });
-
   const mediaConfig = await prisma.mediaConfig.findFirst({
     include: {
       countries: { orderBy: { order: "asc" } },
       highlights: { orderBy: { order: "asc" } },
       tvStations: { orderBy: { order: "asc" } },
       pressItems: { orderBy: { order: "asc" } },
+    },
+  });
+
+  const connectTrainingConfig = await prisma.connectTrainingConfig.findFirst({
+    include: {
+      programs: { orderBy: { order: "asc" } },
+      socials: { orderBy: { order: "asc" } },
     },
   });
 
@@ -376,14 +400,12 @@ export default async function AdminDashboard() {
     const titleEn = (formData.get("titleEn") as string) || "";
     const descVi = (formData.get("descVi") as string) || "";
     const descEn = (formData.get("descEn") as string) || "";
-
     const existingMedia = await prisma.mediaConfig.findFirst();
     const currentMapUrl = await uploadAndCleanStorage({
       bucketName: "media-core",
       newFile: mapFile,
       oldUrl: existingMedia?.mapImg,
     });
-
     const finalCountries = [];
     for (let i = 0; i < countriesList.length; i++) {
       const item = countriesList[i];
@@ -402,7 +424,6 @@ export default async function AdminDashboard() {
         order: i,
       });
     }
-
     const finalHighlights = [];
     for (let i = 0; i < highlightsList.length; i++) {
       const item = highlightsList[i];
@@ -422,7 +443,6 @@ export default async function AdminDashboard() {
         order: i,
       });
     }
-
     const finalTv = [];
     for (let i = 0; i < tvList.length; i++) {
       const item = tvList[i];
@@ -436,7 +456,6 @@ export default async function AdminDashboard() {
       }
       finalTv.push({ src: url || "", order: i });
     }
-
     const finalPress = [];
     for (let i = 0; i < pressList.length; i++) {
       const item = pressList[i];
@@ -458,7 +477,6 @@ export default async function AdminDashboard() {
       }
       finalPress.push({ logo: lUrl || "", article: aUrl || "", order: i });
     }
-
     if (existingMedia) {
       await prisma.$transaction([
         prisma.mediaCountry.deleteMany({
@@ -503,6 +521,110 @@ export default async function AdminDashboard() {
         },
       });
     }
+    revalidatePath("/");
+    revalidatePath("/admin");
+  }
+
+  async function updateConnectTrainingAction(
+    formData: FormData,
+    programsList: ProgramParam[],
+    socialsList: SocialParam[],
+    logoFile: File | null,
+  ) {
+    "use server";
+    const trainingTitleVi = (formData.get("trainingTitleVi") as string) || "";
+    const trainingTitleEn = (formData.get("trainingTitleEn") as string) || "";
+    const connectTitleVi = (formData.get("connectTitleVi") as string) || "";
+    const connectTitleEn = (formData.get("connectTitleEn") as string) || "";
+    const fanpageTitle = (formData.get("fanpageTitle") as string) || "";
+    const fanpageUrl = (formData.get("fanpageUrl") as string) || "";
+
+    const existingConfig = await prisma.connectTrainingConfig.findFirst();
+    const currentLogoUrl = await uploadAndCleanStorage({
+      bucketName: "media-core",
+      newFile: logoFile,
+      oldUrl: existingConfig?.logoIcon,
+    });
+
+    const finalPrograms = [];
+    for (let i = 0; i < programsList.length; i++) {
+      const item = programsList[i];
+      let url = item.icon;
+      if (item.imageFile) {
+        url = await uploadAndCleanStorage({
+          bucketName: "training-icons",
+          newFile: item.imageFile,
+          oldUrl: item.id ? item.icon : null,
+        });
+      }
+      finalPrograms.push({
+        vi: item.vi || "",
+        en: item.en || "",
+        icon: url || "",
+        order: i,
+      });
+    }
+
+    const finalSocials = [];
+    for (let i = 0; i < socialsList.length; i++) {
+      const item = socialsList[i];
+      let url = item.iconImg;
+      if (item.imageFile) {
+        url = await uploadAndCleanStorage({
+          bucketName: "social-icons",
+          newFile: item.imageFile,
+          oldUrl: item.id ? item.iconImg : null,
+        });
+      }
+      finalSocials.push({
+        titleVi: item.titleVi || "",
+        titleEn: item.titleEn || "",
+        linkText: item.linkText || "",
+        url: item.url || "",
+        bgColor: item.bgColor || "",
+        iconImg: url || "",
+        order: i,
+      });
+    }
+
+    if (existingConfig) {
+      await prisma.$transaction([
+        prisma.trainingProgram.deleteMany({
+          where: { connectTrainingConfigId: existingConfig.id },
+        }),
+        prisma.socialLink.deleteMany({
+          where: { connectTrainingConfigId: existingConfig.id },
+        }),
+        prisma.connectTrainingConfig.update({
+          where: { id: existingConfig.id },
+          data: {
+            trainingTitleVi,
+            trainingTitleEn,
+            connectTitleVi,
+            connectTitleEn,
+            fanpageTitle,
+            fanpageUrl,
+            logoIcon: currentLogoUrl,
+            programs: { create: finalPrograms },
+            socials: { create: finalSocials },
+          },
+        }),
+      ]);
+    } else {
+      await prisma.connectTrainingConfig.create({
+        data: {
+          trainingTitleVi,
+          trainingTitleEn,
+          connectTitleVi,
+          connectTitleEn,
+          fanpageTitle,
+          fanpageUrl,
+          logoIcon: currentLogoUrl,
+          programs: { create: finalPrograms },
+          socials: { create: finalSocials },
+        },
+      });
+    }
 
     revalidatePath("/");
     revalidatePath("/admin");
@@ -513,8 +635,8 @@ export default async function AdminDashboard() {
         id: expertiseConfig.id,
         createdAt: expertiseConfig.createdAt,
         updatedAt: expertiseConfig.updatedAt,
-        titleVi: expertiseConfig.titleVi || "",
-        titleEn: expertiseConfig.titleEn || "",
+        titleVi: expertiseConfig.titleVi || "CÁC MẢNG CHUYÊN MÔN",
+        titleEn: expertiseConfig.titleEn || "AREAS OF EXPERTISE",
         items: expertiseConfig.items.map((item) => ({
           id: item.id,
           createdAt: item.createdAt,
@@ -546,7 +668,6 @@ export default async function AdminDashboard() {
         })),
       }
     : null;
-
   const sanitizedMediaData = mediaConfig
     ? {
         id: mediaConfig.id,
@@ -580,6 +701,34 @@ export default async function AdminDashboard() {
       }
     : null;
 
+  const sanitizedConnectTrainingData = connectTrainingConfig
+    ? {
+        id: connectTrainingConfig.id,
+        trainingTitleVi: connectTrainingConfig.trainingTitleVi || "",
+        trainingTitleEn: connectTrainingConfig.trainingTitleEn || "",
+        connectTitleVi: connectTrainingConfig.connectTitleVi || "",
+        connectTitleEn: connectTrainingConfig.connectTitleEn || "",
+        fanpageTitle: connectTrainingConfig.fanpageTitle || "",
+        fanpageUrl: connectTrainingConfig.fanpageUrl || "",
+        logoIcon: connectTrainingConfig.logoIcon || "",
+        programs: connectTrainingConfig.programs.map((i) => ({
+          id: i.id,
+          vi: i.vi || "",
+          en: i.en || "",
+          icon: i.icon || "",
+        })),
+        socials: connectTrainingConfig.socials.map((i) => ({
+          id: i.id,
+          titleVi: i.titleVi || "",
+          titleEn: i.titleEn || "",
+          linkText: i.linkText || "",
+          url: i.url || "",
+          bgColor: i.bgColor || "#1877F2",
+          iconImg: i.iconImg || "",
+        })),
+      }
+    : null;
+
   return (
     <AdminLayout userEmail={user?.email} logoutAction={logout}>
       <div className="space-y-10">
@@ -597,6 +746,10 @@ export default async function AdminDashboard() {
         <ConnectionsAndMediaForm
           initialData={sanitizedMediaData}
           onSave={updateMediaAction}
+        />
+        <ConnectAndTrainingForm
+          initialData={sanitizedConnectTrainingData}
+          onSave={updateConnectTrainingAction}
         />
       </div>
     </AdminLayout>
