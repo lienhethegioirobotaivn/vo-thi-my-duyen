@@ -338,3 +338,16 @@ model FooterConfig {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
+
+model Metadata {
+  id          String   @id @default(uuid())
+  title       String   @default("ThS. Võ Thị Mỹ Duyên | Giảng viên, Diễn giả & Cố vấn chiến lược")
+  description String   @default("Khám phá hành trình và dịch vụ của ThS. Võ Thị Mỹ Duyên - Giảng viên chuyên nghiệp, Diễn giả truyền cảm hứng và Cố vấn chiến lược uy tín cho doanh nghiệp.")
+  keywords    String   @default("Võ Thị Mỹ Duyên, ThS Võ Thị Mỹ Duyên, Diễn giả Võ Thị Mỹ Duyên, Cố vấn chiến lược, Giảng viên")
+  ogTitle     String   @default("ThS. Võ Thị Mỹ Duyên | Giảng viên, Diễn giả & Cố vấn chiến lược")
+  ogDesc      String   @default("Chuyên gia đào tạo, diễn giả truyền cảm hứng và cố vấn chiến lược phát triển.")
+  ogImage     String   @default("/anh_se_them_vao_tu_admin_page.jpg")
+  favicon     String   @default("/favicon.ico")
+  siteUrl     String   @default("https://www.vothimyduyen.com")
+  updatedAt   DateTime @updatedAt
+}

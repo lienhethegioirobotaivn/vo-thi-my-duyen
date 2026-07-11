@@ -78,17 +78,9 @@ export function MediaHighlightsCarousel({ items }: { items: Highlight[] }) {
           {extended.map((item, index) => (
             <div
               key={index}
-              className="shrink-0 w-full sm:w-[calc((100%-24px)/2)] lg:w-[calc((100%-72px)/4)] flex flex-col items-center"
+              className="shrink-0 w-full sm:w-[calc((100%-24px)/2)] lg:w-[calc((100%-72px)/4)] flex flex-col"
             >
-              <div className="lg:h-16 flex flex-col items-center mb-3 text-center">
-                <h4 className="text-lg lg:text-sm font-bold text-[#0a1b35] whitespace-pre-line leading-tight">
-                  {item.titleVi}
-                </h4>
-                <p className="text-sm lg:text-[10px] text-gray-500 whitespace-pre-line uppercase mt-1">
-                  {item.titleEn}
-                </p>
-              </div>
-              <div className="relative w-full aspect-video rounded-xl overflow-hidden mb-4 shadow group">
+              <div className="relative w-full aspect-video rounded-xl overflow-hidden mb-3 shadow group">
                 {item.img && (
                   <Image
                     src={item.img}
@@ -98,15 +90,27 @@ export function MediaHighlightsCarousel({ items }: { items: Highlight[] }) {
                   />
                 )}
               </div>
-              <Link
-                href={item.href}
-                target="_blank"
-                className="flex flex-col items-center border border-[#c29b57] bg-[#c29b57]/5 hover:bg-[#c29b57] text-[#c29b57] hover:text-white rounded-md p-2 transition-colors duration-200"
-              >
-                <span className="text-xs font-semibold">
-                  Xem thêm / View more
-                </span>
-              </Link>
+
+              <div className="flex flex-col items-center text-center w-full px-2 mb-4 flex-1">
+                <h4 className="text-base sm:text-lg lg:text-sm font-bold text-[#0a1b35] leading-tight whitespace-pre-line">
+                  {item.titleVi}
+                </h4>
+                <p className="text-xs sm:text-sm lg:text-[10px] text-gray-500 uppercase mt-1.5 whitespace-pre-line">
+                  {item.titleEn}
+                </p>
+              </div>
+
+              <div className="mt-auto w-full flex justify-center">
+                <Link
+                  href={item.href}
+                  target="_blank"
+                  className="inline-flex flex-col items-center border border-[#c29b57] bg-[#c29b57]/5 hover:bg-[#c29b57] text-[#c29b57] hover:text-white rounded-md p-2 transition-colors duration-200 w-full text-center"
+                >
+                  <span className="text-xs font-semibold">
+                    Xem thêm / View more
+                  </span>
+                </Link>
+              </div>
             </div>
           ))}
         </div>

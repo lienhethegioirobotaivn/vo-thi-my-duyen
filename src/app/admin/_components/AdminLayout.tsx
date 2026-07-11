@@ -11,6 +11,7 @@ import {
   PanelBottom,
   PanelTop,
   Undo2,
+  LayoutDashboard,
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -26,8 +27,13 @@ const NAV_ITEMS = [
     icon: Undo2,
   },
   {
-    label: "Quản trị Home",
+    label: "Tổng quan",
     href: "/admin",
+    icon: LayoutDashboard,
+  },
+  {
+    label: "Quản trị Home",
+    href: "/admin/home",
     icon: Home,
   },
   {
