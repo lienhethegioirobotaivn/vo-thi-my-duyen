@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trash2, Save, Upload } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  Save,
+  Upload,
+  ArrowLeft,
+  ArrowRight,
+} from "lucide-react";
 
 interface LogoItem {
   id?: string;
@@ -86,6 +93,24 @@ export function StrategicClientsForm({
     const next = [...tabs];
     next[index][key] = val;
     setTabs(next);
+  };
+
+  const handleMoveTab = (index: number, direction: "left" | "right") => {
+    const nextIdx = direction === "left" ? index - 1 : index + 1;
+    if (nextIdx < 0 || nextIdx >= tabs.length) return;
+
+    const nextTabs = [...tabs];
+    const temp = nextTabs[index];
+    nextTabs[index] = nextTabs[nextIdx];
+    nextTabs[nextIdx] = temp;
+
+    setTabs(nextTabs);
+
+    if (activeTabIdx === index) {
+      setActiveTabIdx(nextIdx);
+    } else if (activeTabIdx === nextIdx) {
+      setActiveTabIdx(index);
+    }
   };
 
   const handleAddLogo = () => {
@@ -198,17 +223,49 @@ export function StrategicClientsForm({
             <Plus size={14} /> Thêm phân nhóm Tab
           </button>
         </div>
-        <div className="flex flex-wrap gap-1 bg-gray-100 p-1 rounded-lg">
-          {tabs.map((tab, idx) => (
-            <button
-              key={tab.tabKey}
-              type="button"
-              onClick={() => setActiveTabIdx(idx)}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer ${activeTabIdx === idx ? "bg-[#0a1b35] text-white shadow-sm" : "text-gray-600 hover:bg-gray-200"}`}
-            >
-              {tab.vi || tab.tabKey}
-            </button>
-          ))}
+        <div className="flex flex-wrap gap-2 bg-gray-100 p-1.5 rounded-lg">
+          {tabs.map((tab, idx) => {
+            const isActive = activeTabIdx === idx;
+            return (
+              <div
+                key={tab.tabKey}
+                className={`flex items-center gap-1 p-1 rounded-md transition-all ${
+                  isActive
+                    ? "bg-[#0a1b35] text-white shadow-sm"
+                    : "text-gray-600 hover:bg-gray-200"
+                }`}
+              >
+                <button
+                  type="button"
+                  onClick={() => setActiveTabIdx(idx)}
+                  className="px-2 py-1 text-xs font-medium cursor-pointer outline-none"
+                >
+                  {tab.vi || tab.tabKey}
+                </button>
+
+                {isActive && tabs.length > 1 && (
+                  <div className="flex items-center border-l border-white/20 pl-1 gap-0.5">
+                    <button
+                      type="button"
+                      disabled={idx === 0}
+                      onClick={() => handleMoveTab(idx, "left")}
+                      className="p-0.5 hover:bg-white/20 rounded disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer"
+                    >
+                      <ArrowLeft size={12} />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={idx === tabs.length - 1}
+                      onClick={() => handleMoveTab(idx, "right")}
+                      className="p-0.5 hover:bg-white/20 rounded disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer"
+                    >
+                      <ArrowRight size={12} />
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 

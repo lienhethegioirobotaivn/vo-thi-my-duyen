@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trash2, Save, Upload } from "lucide-react";
+import { Plus, Trash2, Save, Upload, ArrowUp, ArrowDown } from "lucide-react";
 
 interface CountryItem {
   id?: string;
@@ -79,6 +79,18 @@ export function ConnectionsAndMediaForm({
   const [pressItems, setPressItems] = useState<PressItem[]>(
     initialData?.pressItems || [],
   );
+
+  const moveCountry = (index: number, direction: "up" | "down") => {
+    if (direction === "up" && index === 0) return;
+    if (direction === "down" && index === countries.length - 1) return;
+
+    const nextIndex = direction === "up" ? index - 1 : index + 1;
+    const nextCountries = [...countries];
+    const temp = nextCountries[index];
+    nextCountries[index] = nextCountries[nextIndex];
+    nextCountries[nextIndex] = temp;
+    setCountries(nextCountries);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -207,12 +219,33 @@ export function ConnectionsAndMediaForm({
         <span className="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
           Kích thước khuyến nghị: 1000 x 700 px (Tỷ lệ 10:7, dưới 2MB)
         </span>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="block md:columns-2 gap-4 space-y-4 md:space-y-0">
           {countries.map((item, index) => (
             <div
               key={index}
-              className="p-3 bg-gray-50 border rounded-xl flex gap-3 items-center"
+              className="p-3 bg-gray-50 border rounded-xl flex gap-3 items-center break-inside-avoid mb-4"
             >
+              <div className="text-gray-700 font-medium min-w-4 text-center">
+                {index + 1}
+              </div>
+              <div className="flex flex-col gap-1 shrink-0">
+                <button
+                  type="button"
+                  disabled={index === 0}
+                  onClick={() => moveCountry(index, "up")}
+                  className="text-gray-400 hover:text-gray-600 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                >
+                  <ArrowUp size={14} />
+                </button>
+                <button
+                  type="button"
+                  disabled={index === countries.length - 1}
+                  onClick={() => moveCountry(index, "down")}
+                  className="text-gray-400 hover:text-gray-600 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                >
+                  <ArrowDown size={14} />
+                </button>
+              </div>
               <div className="relative w-10 h-7 border rounded bg-white text-gray-800 shrink-0 flex items-center justify-center overflow-hidden cursor-pointer">
                 {item.flag ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -268,7 +301,7 @@ export function ConnectionsAndMediaForm({
                 onClick={() =>
                   setCountries(countries.filter((_, i) => i !== index))
                 }
-                className="text-red-500 hover:bg-red-50 cursor-pointer p-2 rounded-md"
+                className="text-red-500 hover:bg-red-50 cursor-pointer p-2 rounded-md shrink-0"
               >
                 <Trash2 size={16} />
               </button>
