@@ -101,7 +101,7 @@ export function NavbarClient({
             </div>
             <Link
               href={bookHref}
-              className="hidden lg:flex flex-col items-center justify-center bg-linear-to-b from-[#d5b06d] to-[#b3874c] hover:opacity-95 text-white px-5 py-2 rounded shadow-sm transition-all active:scale-95"
+              className="hidden lg:flex flex-col items-center justify-center text-center bg-linear-to-b from-[#d5b06d] to-[#b3874c] hover:opacity-95 text-white px-5 py-2 rounded shadow-sm transition-all active:scale-95"
             >
               <span className="text-[11px] font-bold">{bookTextVi}</span>
               <span className="text-[9px] uppercase opacity-90">

@@ -63,7 +63,7 @@ export async function ProfileHighlights() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-              <div className="space-y-6">
+              <div className="space-y-6 text-justify">
                 {column1.map((item) => (
                   <div key={item.id} className="flex items-start gap-3">
                     <div className="shrink-0 w-5 h-5 rounded-full border border-[#c29b57] flex items-center justify-center mt-0.5 text-[#c29b57]">
@@ -93,7 +93,7 @@ export async function ProfileHighlights() {
                 ))}
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-6 text-justify">
                 {column2.map((item) => (
                   <div key={item.id} className="flex items-start gap-3">
                     <div className="shrink-0 w-5 h-5 rounded-full border border-[#c29b57] flex items-center justify-center mt-0.5 text-[#c29b57]">

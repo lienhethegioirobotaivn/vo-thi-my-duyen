@@ -23,8 +23,12 @@ export async function Hero() {
 
   return (
     <section
-      className="relative w-full lg:min-h-screen bg-white bg-center bg-no-repeat bg-cover flex items-center"
-      style={{ backgroundImage: bgUrl ? `url('${bgUrl}')` : "none" }}
+      className="relative w-full bg-white flex items-center lg:min-h-screen bg-no-repeat bg-center bg-cover md:bg-(image:--bg-url)"
+      style={
+        {
+          "--bg-url": bgUrl ? `url('${bgUrl}')` : "none",
+        } as React.CSSProperties
+      }
     >
       <div className="w-full mx-auto px-6 lg:px-20 relative z-10 py-12">
         <div className="max-w-xl md:max-w-2xl text-left flex flex-col items-start">
