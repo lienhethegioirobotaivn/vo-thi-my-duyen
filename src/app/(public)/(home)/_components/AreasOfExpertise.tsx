@@ -52,30 +52,42 @@ export async function AreasOfExpertise() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-y-8 lg:gap-y-0 lg:divide-x lg:divide-[#e2d5c3]/60">
-            {expertiseConfig.items.map((item) => (
-              <div
-                key={item.id}
-                className="flex flex-col items-center text-center px-2 lg:px-3"
-              >
-                <div className="relative size-14 shrink-0 mb-3">
-                  <Image
-                    src={item.icon ?? ""}
-                    alt={(item.vi ?? "").replace("\n", " ")}
-                    fill
-                    className="object-contain"
-                  />
+          <div className="flex flex-wrap justify-center gap-y-8">
+            {expertiseConfig.items.map((item, index) => {
+              const isLastItem = index === expertiseConfig.items.length - 1;
+
+              const isLastMobile = (index + 1) % 2 === 0;
+              const isLastTablet = (index + 1) % 4 === 0;
+              const isLastDesktop = (index + 1) % 7 === 0;
+
+              return (
+                <div
+                  key={item.id}
+                  className={`box-border w-1/2 sm:w-1/4 lg:w-[calc(100%/7)] flex flex-col items-center text-center px-2 lg:px-3
+                              ${!isLastMobile && !isLastItem ? "border-r border-[#e2d5c3]/60" : "border-r-0"} 
+                              ${!isLastTablet && !isLastItem ? "sm:border-r sm:border-[#e2d5c3]/60" : "sm:border-r-0"} 
+                              ${!isLastDesktop && !isLastItem ? "lg:border-r lg:border-[#e2d5c3]/60" : "lg:border-r-0"}
+                  `}
+                >
+                  <div className="relative size-10 shrink-0 mb-3">
+                    <Image
+                      src={item.icon ?? ""}
+                      alt={(item.vi ?? "").replace("\n", " ")}
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
+
+                  <h3 className="text-xs sm:text-sm font-bold text-[#0a1b35] leading-snug flex items-center justify-center whitespace-pre-line">
+                    {item.vi}
+                  </h3>
+
+                  <p className="text-[11px] sm:text-xs italic text-[#0a1b35]/90 mt-2 leading-normal flex items-start justify-center whitespace-pre-line">
+                    {item.en}
+                  </p>
                 </div>
-
-                <h3 className="text-xs sm:text-sm font-bold text-[#0a1b35] leading-snug flex items-center justify-center whitespace-pre-line">
-                  {item.vi}
-                </h3>
-
-                <p className="text-[11px] sm:text-xs italic text-[#0a1b35]/90 mt-2 leading-normal flex items-start justify-center whitespace-pre-line">
-                  {item.en}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
