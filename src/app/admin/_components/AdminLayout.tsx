@@ -12,6 +12,7 @@ import {
   PanelTop,
   Undo2,
   LayoutDashboard,
+  Form,
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -45,6 +46,11 @@ const NAV_ITEMS = [
     label: "Quản trị Footer",
     href: "/admin/footer",
     icon: PanelBottom,
+  },
+  {
+    label: "Quản trị Form",
+    href: "/admin/form-settings",
+    icon: Form,
   },
 ];
 

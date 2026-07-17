@@ -351,3 +351,10 @@ model Metadata {
   siteUrl     String   @default("https://www.vothimyduyen.com")
   updatedAt   DateTime @updatedAt
 }
+
+model FormSettings {
+  id              String   @id @default(cuid())
+  formKey         String   @unique
+  recipientEmail  String
+  updatedAt       DateTime @updatedAt
+}

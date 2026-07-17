@@ -1,7 +1,10 @@
+// FooterClient.tsx
 "use client";
 
 import { useState } from "react";
 import { Phone, Mail, Globe, MapPin } from "lucide-react";
+import { submitFormAction } from "@/app/actions/form-submit";
+import Link from "next/link";
 
 interface FooterDataProps {
   data: {
@@ -34,15 +37,61 @@ export function FooterClient({ data }: FooterDataProps) {
   });
 
   const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [speakerStatus, setSpeakerStatus] = useState("");
+  const [newsletterStatus, setNewsletterStatus] = useState("");
+  const [speakerSubmitting, setSpeakerSubmitting] = useState(false);
+  const [newsletterSubmitting, setNewsletterSubmitting] = useState(false);
 
-  const handleSpeakerSubmit = (e: React.FormEvent) => {
+  const handleSpeakerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Speaker Booking Data:", speakerForm);
+    setSpeakerSubmitting(true);
+    setSpeakerStatus("");
+
+    const result = await submitFormAction({
+      formKey: "speaker-booking",
+      subject: "vothimyduyen.com - Yêu cầu đặt lịch diễn giả mới",
+      fields: {
+        "Họ và tên": speakerForm.fullName,
+        Email: speakerForm.email,
+        "Số điện thoại": speakerForm.phone,
+        "Tổ chức": speakerForm.organization,
+        "Nội dung yêu cầu": speakerForm.request,
+        "Thời gian dự kiến": speakerForm.expectedDate,
+      },
+    });
+
+    setSpeakerSubmitting(false);
+    setSpeakerStatus(result.message);
+
+    if (result.success) {
+      setSpeakerForm({
+        fullName: "",
+        email: "",
+        phone: "",
+        organization: "",
+        request: "",
+        expectedDate: "",
+      });
+    }
   };
 
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Newsletter Email:", newsletterEmail);
+    setNewsletterSubmitting(true);
+    setNewsletterStatus("");
+
+    const result = await submitFormAction({
+      formKey: "newsletter",
+      subject: "Đăng ký newsletter mới",
+      fields: { Email: newsletterEmail },
+    });
+
+    setNewsletterSubmitting(false);
+    setNewsletterStatus(result.message);
+
+    if (result.success) {
+      setNewsletterEmail("");
+    }
   };
 
   return (
@@ -100,19 +149,19 @@ export function FooterClient({ data }: FooterDataProps) {
                 <div className="w-8 h-8 rounded-full flex items-center justify-center text-[#c29b57] group-hover:bg-[#c29b57] group-hover:text-[#0a1b35] transition-colors">
                   <Mail className="size-5" />
                 </div>
-                <a
+                <Link
                   href={`mailto:${data.email}`}
                   className="text-white/80 hover:text-[#c29b57] transition-colors"
                 >
                   {data.email}
-                </a>
+                </Link>
               </div>
 
               <div className="flex items-center gap-2 group">
                 <div className="w-8 h-8 rounded-full flex items-center justify-center text-[#c29b57] group-hover:bg-[#c29b57] group-hover:text-[#0a1b35] transition-colors">
                   <Globe className="size-5" />
                 </div>
-                <a
+                <Link
                   href={
                     data.website.startsWith("http")
                       ? data.website
@@ -123,7 +172,7 @@ export function FooterClient({ data }: FooterDataProps) {
                   className="text-white/80 hover:text-[#c29b57] transition-colors"
                 >
                   {data.website}
-                </a>
+                </Link>
               </div>
 
               <div className="flex items-start gap-3 group">
@@ -220,13 +269,23 @@ export function FooterClient({ data }: FooterDataProps) {
                   }
                 />
               </div>
-              <div className="bg-white p-2 flex justify-center border-t border-gray-100">
+              <div className="bg-white p-2 flex flex-col items-center gap-2 border-t border-gray-100">
                 <button
                   type="submit"
-                  className="relative z-10 bg-linear-to-r from-[#c29b57] to-[#a37c3f] text-white text-[11px] font-bold uppercase py-2.5 px-8 rounded-full shadow transition-all duration-300 cursor-pointer overflow-hidden before:absolute before:inset-0 before:bg-linear-to-b before:from-[#a37c3f] before:to-[#c29b57] before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 before:-z-10"
+                  disabled={speakerSubmitting}
+                  className="relative z-10 bg-linear-to-r from-[#c29b57] to-[#a37c3f] text-white text-[11px] font-bold uppercase py-2.5 px-8 rounded-full shadow transition-all duration-300 cursor-pointer overflow-hidden disabled:opacity-50 before:absolute before:inset-0 before:bg-linear-to-b before:from-[#a37c3f] before:to-[#c29b57] before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 before:-z-10"
                 >
-                  GỬI YÊU CẦU / SEND REQUEST
+                  {speakerSubmitting
+                    ? "ĐANG GỬI..."
+                    : "GỬI YÊU CẦU / SEND REQUEST"}
                 </button>
+                {speakerStatus && (
+                  <div className="mt-1 w-fit mx-auto rounded-full px-3 py-1">
+                    <p className="text-[15px] text-center font-semibold text-black">
+                      {speakerStatus}
+                    </p>
+                  </div>
+                )}
               </div>
             </form>
           </div>
@@ -260,10 +319,18 @@ export function FooterClient({ data }: FooterDataProps) {
               />
               <button
                 type="submit"
-                className="relative z-10 w-full bg-linear-to-br from-[#c29b57] to-[#a37c3f] text-white text-xs font-bold uppercase py-3 rounded-lg shadow transition-all duration-300 cursor-pointer overflow-hidden before:absolute before:inset-0 before:bg-linear-to-br before:from-[#a37c3f] before:to-[#c29b57] before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 before:-z-10"
+                disabled={newsletterSubmitting}
+                className="relative z-10 w-full bg-linear-to-br from-[#c29b57] to-[#a37c3f] text-white text-xs font-bold uppercase py-3 rounded-lg shadow transition-all duration-300 cursor-pointer overflow-hidden disabled:opacity-50 before:absolute before:inset-0 before:bg-linear-to-br before:from-[#a37c3f] before:to-[#c29b57] before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 before:-z-10"
               >
-                ĐĂNG KÝ / SUBSCRIBE
+                {newsletterSubmitting ? "ĐANG GỬI..." : "ĐĂNG KÝ / SUBSCRIBE"}
               </button>
+              {newsletterStatus && (
+                <div className="mt-1 w-fit mx-auto rounded-md bg-white/5 border border-white/10 px-3 py-1">
+                  <p className="text-sm text-center font-[550] text-[#c29b57]">
+                    {newsletterStatus}
+                  </p>
+                </div>
+              )}
             </form>
           </div>
         </div>
