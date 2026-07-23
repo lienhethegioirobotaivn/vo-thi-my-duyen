@@ -4,6 +4,7 @@ import { ProfileHighlights } from "@/app/(public)/(home)/_components/ProfileHigh
 import { AreasOfExpertise } from "@/app/(public)/(home)/_components/AreasOfExpertise";
 import { Services } from "@/app/(public)/(home)/_components/Services";
 import { ConnectionsAndMedia } from "@/app/(public)/(home)/_components/ConnectionsAndMedia";
+import { PublishedArticles } from "@/app/(public)/(home)/_components/PublishedArticles";
 import { ConnectAndTraining } from "@/app/(public)/(home)/_components/ConnectAndTraining";
 import { ActivityHighlights } from "@/app/(public)/(home)/_components/ActivityHighlights";
 import { StrategicClients } from "@/app/(public)/(home)/_components/StrategicClients";
@@ -23,6 +24,7 @@ export default function Home() {
       <div id="training">
         <ConnectionsAndMedia />
       </div>
+      <PublishedArticles />
       <div id="contact">
         <ConnectAndTraining />
       </div>
